@@ -1,4 +1,4 @@
-# AskJimBob's Build Better ColdFusion Applications - Episode One: Secutiry - Part One Example Code
+# AskJimBob's Build Better ColdFusion Applications - Episode One: Security - Part One Example Code
 
 This is the example code for the first episode of AskJimBob's Build Better ColdFusion Applications series. 
 
