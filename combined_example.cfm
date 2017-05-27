@@ -23,7 +23,7 @@
 		// mock the input from the request context in an MVC 
 		// framework (FW/1, ColdBox, etc.)
 		rc = {
-			userId = createGuid(),
+			userId = '3820F9C3-7422-4CB5-B83A-D42E7DF10E2D',
 			format = 'pdf',
 			startDate = dateFormat( dateAdd( 'd', -30, now() ), 'mm-dd-yyyy' ),
 			endDate = dateFormat( now(), 'mm-dd-yyyy' )
@@ -34,12 +34,12 @@
 		// a handler/controller/model as needed for encryption
 		keyrings = {
 			url = {
-				key = generateSecretKey( 'AES' ),
+				key = 'Pm4LlhAk2+9fWBrXPGpSSQ==', //generateSecretKey( 'AES' )
 				alg = 'AES/CBC/PKCS5Padding',
 				enc = 'HEX'
 			},
 			form = {
-				key = generateSecretKey( 'BLOWFISH' ),
+				key = 'LpY1uaZDz7Pk/QkLRT6Shg==', //generateSecretKey( 'BLOWFISH' )
 				alg = 'BLOWFISH/CBC/PKCS5Padding',
 				enc = 'HEX'
 			}

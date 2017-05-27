@@ -17,6 +17,73 @@
  
 <body>
 
+	<cfscript>
+
+		// mock a set of url and form keys for encryption
+		// keyrings are usually stored safely and injected into
+		// a handler/controller/model as needed for encryption
+		keyrings = {
+			url = {
+				key = 'Pm4LlhAk2+9fWBrXPGpSSQ==', //generateSecretKey( 'AES' )
+				alg = 'AES/CBC/PKCS5Padding',
+				enc = 'HEX'
+			},
+			form = {
+				key = 'LpY1uaZDz7Pk/QkLRT6Shg==', //generateSecretKey( 'BLOWFISH' )
+				alg = 'BLOWFISH/CBC/PKCS5Padding',
+				enc = 'HEX'
+			}
+		}
+
+		// mock hashing the paramter names 
+		// this is usually done inside the handler/controller 
+		// and passed to the view for rendering of hashed parameter names
+		hashedParams = { 
+			url = {
+				userIdHash = 'v' & hash( 'userId', 'SHA-256', 'utf-8', 42 ),
+				formatHash = 'v' & hash( 'format', 'SHA-256', 'utf-8', 24 ),
+				startDateHash = 'v' & hash( 'startDate', 'SHA-256', 'utf-8', 96 ),
+				endDateHash = 'v' & hash( 'endDate', 'SHA-256', 'utf-8', 69 )
+			},
+			form = {
+				userIdHash = 'f' & hash( 'userId', 'SHA-384', 'utf-8', 57 ),
+			}
+		}
+
+		// initialize a struct to hold results of hashed and/or 
+		// encrypted parameters
+		results = {};
+
+		// loop through the possible hased URL parameters
+		for( key in hashedParams.url ) {
+			// check if this URL parameter exists in the URL struct
+			if( URL.keyExists( hashedParams.url[ key ] ) ) {
+				// it does, try to
+				try {
+					// decrypt the value of the hashed variable
+					// and set it in the results struct
+					results[ key ] = decrypt( URL[ hashedParams.url[ key ] ], keyrings.url.key, keyrings.url.alg, keyrings.url.enc );
+				// catch any errors (e.g. not encrypted)
+				} catch( any e ) {
+					// set the results struct to the value passed in (non encrypted values)
+					results[ key ] = URL[ hashedParams.url[ key ] ];
+				}
+			}
+		}
+
+		// do the same as above, but for FORM variables instead of URL parameters
+		for( key in hashedParams.form ) {
+			if( FORM.keyExists( hashedParams.form[ key ] ) ) {
+				try {
+					results[ key ] = decrypt( FORM[ hashedParams.form[ key ] ], keyrings.form.key, keyrings.form.alg, keyrings.form.enc );
+				} catch( any e ) {
+					results[ key ] = FORM[ hashedParams.form[ key ] ];
+				}
+			}
+		}
+
+	</cfscript>
+
 	<div id="wrapper" class="container-fluid">
 
 		<div class="row">
@@ -37,14 +104,21 @@
 					if( URL.keyArray().len() ) {
 						writeOutput( '<h4>URL</h4><ol>' );
 						for( key in URL.keyArray() ) {
-							writeOutput( '<li>#key# = #URL[ key ]#</li>');
+							writeOutput( '<li>#key# = #URL[ key ]#</li>' );
 						}
 						writeOutput( '</ol>' );
 					}
 					if( FORM.keyArray().len() ) {
 						writeOutput( '<h4>FORM</h4><ol>' );
 						for( key in FORM.keyArray() ) {
-							writeOutput( '<li>#key# = #FORM[ key ]#</li>');
+							writeOutput( '<li>#key# = #FORM[ key ]#</li>' );
+						}
+						writeOutput( '</ol>' );
+					}
+					if( results.len() ) {
+						writeOutput( '<h4>Results</h4><ol>' );
+						for( key in results ) {
+							writeOutput( '<li>#key# = #results[ key ]#</li>' );
 						}
 						writeOutput( '</ol>' );
 					}
